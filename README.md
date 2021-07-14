@@ -5,11 +5,10 @@ Summer 2021
 
 This project selects cryptocurrency coins based on a chosen risk tolerance.  This is accomplished by using the following methodology.
 
-Stage 1: Kmeans clustering is used to group coins into 4 different risk clusters.  A user then chooses a risk profile they would like to invest from the following categories.
-1. High
-2. Somewhat High
-3. Somewhat Low
-4. Low
+Stage 1: Kmeans clustering is used to group coins into 4 different risk clusters.  A user then chooses a risk tolerance they would like to invest from the following categories.
+1. High Risk
+2. Medium Risk
+3. Low Risk
 
 Stage 2: Following the choice of risk profile, a random forest classification model is applied that labels each coin in the cluster as moving either up or down in price.
 
