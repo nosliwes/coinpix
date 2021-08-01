@@ -24,21 +24,59 @@ def gini_impurity(df, label_col):
     denom = freq_true + freq_false
     gini = 2 * freq_true * freq_false / denom
     return gini
+
+def gini_on_split(df, label_col, split_col, split_val, split_type = 'num'):
+    gini = 0.5
+    l_df = None
+    r_df = None
+    if split_type == 'num':
+        l_df = df[df[split_col] < split_val]
+        r_df = df[df[split_col] >= split_val]
+    else:
+        l_df = df[df[split_col] == split_val]
+        r_df = df[df[split_col] != split_val]
+    l_wgt = len(l_df.index)
+    r_wgt = len(r_df.index)
+    l_gini = gini_impurity(l_df, label_col)
+    r_gini = gini_impurity(r_df, label_col)
+    gini = (l_wgt * l_gini + r_wgt * r_gini) / (l_wgt + r_wgt)
+    return gini
     
 
 class Decision_Tree:
-    def __init__(self, data=None, label_col == None, idxs=None, min_records = 5):
+    def __init__(self, data=None, label_col == None, min_records = 5):
         self.min_records = min_records
         self.prediction = labels.mode()
+        self.left = None
+        self.right = None
+        self.label = None
         if data != None and labels != None:
             self.fit(data, labels)
-    def fit(self,data=self.data, label_col=self.label_col):
-        if self.idxs == None:
-            self.idxs = data.index
         
-            
+    def fit(self,data=self.data, label_col=self.label_col):
+        self.data = data
+        self.label_col = label_col
+        if len(data.index) > min_records:
+            self.left, self.right, self.split_col, self.split_val 
+                = self.find_best_split()
+            self.left.fit()
+            self.right.fit()
+        else:
+            # extract the mode label
+            self.label = self.data[label_col].mode().iloc[0][label_col]
     
+    def predict(self, datum, label_col = self.label_col):
+        if self.label == None:
+            if  datum[label_col] >= datum[self.split_col]:
+                return self.right.predict(datum, label_col)
+            else:
+                return self.left.predict(datum, label_col)
+        else:
+            return self.label
     
+    def find_best_fit(self):
+        
+        
 
 # custom random forest class
 class Random_Forest:
