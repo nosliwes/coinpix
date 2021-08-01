@@ -85,6 +85,10 @@ class Random_Forest:
         
     def fit(self,data):
         pass
+    
+    def predict(self, datum):
+        pass
+    
     # method to save the model
     def save_model(self, filename):
         pass
