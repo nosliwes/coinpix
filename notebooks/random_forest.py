@@ -15,12 +15,32 @@ import numpy as np
 import pandas as pd
 import random
 
-class Decision_Tree:
-    def __init__(self, data=None):
-        if not (data == None):
-            self.fit(data)
+# get gini impurity of a df. only works with boolean labels
+def gini_impurity(df, label_col):
+    true_labels = df[df['lable_col'] == True]
+    false_labels = df[df['label_col'] == False]
+    freq_true = len(true_labels.index)
+    freq_false = len(false_labesl.index)
+    denom = freq_true + freq_false
+    gini = 2 * freq_true * freq_false / denom
+    return gini
+    
 
-# custom k-means class
+class Decision_Tree:
+    def __init__(self, data=None, label_col == None, idxs=None, min_records = 5):
+        self.min_records = min_records
+        self.prediction = labels.mode()
+        if data != None and labels != None:
+            self.fit(data, labels)
+    def fit(self,data=self.data, label_col=self.label_col):
+        if self.idxs == None:
+            self.idxs = data.index
+        
+            
+    
+    
+
+# custom random forest class
 class Random_Forest:
     def __init__(self):
         pass
