@@ -3,14 +3,8 @@
 #
 # Custom random forest algorithm
 #
-# The program can be run at the command line with the following arguments.
-#
-#         -data            : the full path to the transaction data
-#         -keep_cols       : the columns to keep in the dataset
-#         -label_col       : the column which represents the class label
 
 # import libraries
-import argparse
 import numpy as np
 import pandas as pd
 import random
@@ -134,6 +128,7 @@ class Random_Forest:
         for i in range(self.n_trees):
             # get a random sample of rows
             random_sample = data.sample(frac = self.row_prop, replace=True)
+            print(len(random_sample), 'rows')
             sample_labels = [label for label in random_sample[self.label_column]]
             random_sample = random_sample.sample(frac = self.column_prop, axis='columns')
             random_sample[self.label_column] = sample_labels
@@ -170,27 +165,3 @@ def load_data(filepath, keep_cols, label_col = None):
     df.dropna(inplace=True)
     
     return df
-            
-# parse command-line arguments
-def create_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-data', type=str, default='dow_jones_index.data', help='Data filename')
-    parser.add_argument('-keep_cols', nargs='+', type=str, default=['days_to_next_dividend', 'percent_change_price'], help='Column names to keep') 
-    parser.add_argument('-label_col', type=str, default=None, help='Column which contains the labels. Should also be contained in keep_cols')
-    parser.add_argument('-model_file', type=str, default=None, help='Name of file to save the model to')
-    args = parser.parse_args()    
-    return args
-
-# main method to run program from command line
-if __name__ == '__main__':
-
-    # get arguments
-    args = create_parser()  
-    
-    # load data and preprocess
-    X = load_data(filepath=args.data, keep_cols=args.keep_cols, label_col=args.label_col)
-    
-    print(X.head())
-    
-    # custom random forest
-    clf = Random_Forest(X, args.label_col)
