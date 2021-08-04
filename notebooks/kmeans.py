@@ -1,4 +1,4 @@
-# CS 5593 - HW 4
+# CS 5593
 # Steven Wilson
 #
 # Custom k-means algorithm
@@ -16,6 +16,7 @@ import argparse
 import numpy as np
 import pandas as pd
 import random
+import json
 
 # custom k-means class
 class K_Means:
@@ -23,8 +24,9 @@ class K_Means:
         self.k = k                # k value
         self.tol = tol            # tolerance 
         self.max_iter = max_iter  # maximum iterations
+        random.seed(22)           # set seed so clusters stay the same
         
-    def fit(self,data):
+    def fit(self,labels,data):
         # initialize centroids dictionary
         self.centroids = {}
         
@@ -47,11 +49,13 @@ class K_Means:
             self.clusters = {}
             self.sse = {}
             self.ids = {}
+            self.names = {}
                 
             for i in range(self.k):
                 self.clusters[i] = []
                 self.sse[i] = []
                 self.ids[i] = []
+                self.names[i] = []
             
             # find distances for each point from centroid
             for idx, x in enumerate(data):
@@ -67,6 +71,7 @@ class K_Means:
                 self.clusters[cluster_index].append(x)
                 self.sse[cluster_index].append(sse)
                 self.ids[cluster_index].append(idx)
+                self.names[cluster_index].append(labels[idx])
 
             # copy current centroids to previous centroids variable to check tolerance
             prev_centroids = dict(self.centroids)
@@ -92,7 +97,13 @@ class K_Means:
                 self.total_sse = 0
                 for index in self.clusters:
                     self.total_sse += np.sum(self.sse[index])
-                break         
+                break   
+                
+        self.results = []
+        for i in range(self.k):
+            for name in self.names[i]:
+                self.results.append((name, i))
+
     
     # method to display results
     def display_clusters(self):
@@ -102,11 +113,15 @@ class K_Means:
             print("Total Sum of Squared Error: ", np.sum(self.sse[idx]))
             print("Cluster Mean: ", self.centroids[cluster])
             print("Ids in Cluster: ", self.ids[cluster])
+            print("Names in Cluster: ", self.names[cluster])     
 
 # method to load data from file
-def load_data(filepath, keep_cols):   
+def load_data(filepath, id_col, keep_cols):   
     # read csv data
     df = pd.read_csv(filepath)
+    
+    # get id columns
+    ids = df[id_col]
     
     # select only keep columns
     df = df[keep_cols]
@@ -114,7 +129,7 @@ def load_data(filepath, keep_cols):
     # drop missing rows
     df.dropna(inplace=True)
     
-    return df.to_numpy()            
+    return ids.to_numpy(), df.to_numpy()            
             
 # parse command-line arguments
 def create_parser():
@@ -122,7 +137,8 @@ def create_parser():
     parser.add_argument('-k', type=int, default=2, help="k value")
     parser.add_argument('-tol', type=float, default=0.001, help="tolerance level")
     parser.add_argument('-max_iter', type=float, default=100, help='maximum iterations')
-    parser.add_argument('-data', type=str, default='dow_jones_index.data', help='Data filename')
+    parser.add_argument('-data', type=str, default='returns.csv', help='Data filename')
+    parser.add_argument('-id_col', type=str, default='coin')
     parser.add_argument('-keep_cols', nargs='+', type=str, default=['days_to_next_dividend', 'percent_change_price'], help='Column names to keep') 
     args = parser.parse_args()    
     return args
@@ -134,12 +150,19 @@ if __name__ == '__main__':
     args = create_parser()  
     
     # load data and preprocess
-    X = load_data(filepath=args.data, keep_cols=args.keep_cols)
+    ids, X = load_data(filepath=args.data, id_col=args.id_col, keep_cols=args.keep_cols)
     
     # custom k-means
     clf = K_Means(k=args.k, tol=args.tol, max_iter=args.max_iter)
-    clf.fit(X)
+    clf.fit(ids, X)
     
     # show results
-    print("k =", args.k)
-    clf.display_clusters()
+    # print("k =", args.k)
+    # clf.display_clusters()
+    
+    print(clf.results)
+    # assemble results
+    df = pd.DataFrame(clf.results, columns=['coin','cluster'])
+    
+    # return results as json
+    print(df.to_json()) 
