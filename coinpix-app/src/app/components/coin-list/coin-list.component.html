@@ -1,0 +1,53 @@
+<div class="container custom-container-2">
+
+    <div class="row">         
+        <span>Choose A Risk Tolerance</span> 
+      </div>
+      <div class="row">       
+          <mat-button-toggle-group name="fontStyle" #group="matButtonToggleGroup" aria-label="Font Style" [value]="id" (change)="onValChange(group.value)">
+            <mat-button-toggle value="0">Low</mat-button-toggle>
+            <mat-button-toggle value="1">Moderate</mat-button-toggle>
+            <mat-button-toggle value="2">High</mat-button-toggle>
+          </mat-button-toggle-group>
+      </div>
+
+    <!-- Show it when there is no coins -->
+    <div class="no-data text-center" *ngIf="Coin.length == 0">
+      <p>There are no coins for this cluster!</p>
+    </div>
+  
+    <!-- Coins list table, it hides when there is no coin -->
+    <div *ngIf="Coin.length !== 0">
+      <div class="row">
+        &nbsp;
+      </div>
+      <div class="col-md-12">
+        <table class="table table-bordered table-dark">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Price</th>
+              <th scope="col">Trend</th>
+              <th scope="col">Optimum</th>
+              <th scope="col">1 day</th>
+              <th scope="col">1 week</th>
+              <th scope="col">1 year</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of Coin">
+              <td>{{c.coin}}</td>
+              <td>{{c.price}}</td>
+              <td>{{c.trend}}</td>
+              <td>{{c.optimum | percent }}</td>
+              <td>{{c.oneday}}</td>
+              <td>{{c.oneweek}}</td>
+              <td>{{c.oneyear}}</td>             
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  
+    </div>
+  
+  </div>
